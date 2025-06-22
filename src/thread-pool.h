@@ -14,6 +14,7 @@
 #include <functional>  // for the function template used in the schedule signature
 #include <thread>      // for thread
 #include <vector>      // for vector
+#include <queue>       // for queue
 #include "Semaphore.h" // for Semaphore
 
 using namespace std;
@@ -29,11 +30,13 @@ using namespace std;
  * worker to process.
  */
 typedef struct worker {
-    thread ts;
-    function<void(void)> thunk;
-    /**
-     * Complete the definition of the worker_t struct here...
-     **/
+    std::thread ts;
+    std::function<void(void)> thunk;
+    bool available;
+    bool busy;
+    Semaphore* ready;
+    Semaphore* done;
+    Semaphore* statusLock; // Semáforo para proteger el estado del worker
 } worker_t;
 
 class ThreadPool {
@@ -51,7 +54,7 @@ class ThreadPool {
   * to be executed by one of the ThreadPool's threads as soon as
   * all previously scheduled thunks have been handled.
   */
-    void schedule(const function<void(void)>& thunk);
+    void schedule(const std::function<void(void)>& thunk);
 
   /**
   * Blocks and waits until all previously scheduled thunks
@@ -67,18 +70,23 @@ class ThreadPool {
     ~ThreadPool();
     
   private:
-
+    thread_local static bool isInsideWorker;
     void worker(int id);
     void dispatcher();
-    thread dt;                              // dispatcher thread handle
-    vector<worker_t> wts;                   // worker thread handles. you may want to change/remove this
-    bool done;                              // flag to indicate the pool is being destroyed
-    mutex queueLock;                        // mutex to protect the queue of tasks
-
-    /* It is incomplete, there should be more private variables to manage the structures... 
-    * *
-    */
-  
+    thread dt;                              
+    vector<worker_t> wts;
+    bool done;
+    Semaphore doneLock;                // Protege el acceso a done
+    Semaphore wtsLock;                 // Protege el acceso al vector wts
+    
+    std::queue<std::function<void(void)>> taskQueue;  // cola de tareas
+    Semaphore queueLock;              // protege la cola de tareas (semáforo binario)
+    Semaphore taskAvailable;          // señaliza cuando hay tareas disponibles
+    Semaphore waitSem;                // usado para la sincronización de wait()
+    
+    size_t pendingTasks;              // contador de tareas pendientes
+    Semaphore taskCountLock;          // protege el contador de tareas pendientes
+    
     /* ThreadPools are the type of thing that shouldn't be cloneable, since it's
     * not clear what it means to clone a ThreadPool (should copies of all outstanding
     * functions to be executed be copied?).
