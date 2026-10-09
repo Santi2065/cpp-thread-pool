@@ -124,7 +124,6 @@ The provided Makefile only builds `main.cc`; the two `g++` lines above build the
 | `src/thread-pool.h` | Class declaration; `worker_t` fields and private members completed | Course skeleton + Santiago |
 | `src/Semaphore.h`, `src/Semaphore.cc` | Semaphore built on `mutex` + `condition_variable_any` | Course |
 | `src/main.cc`, `src/tptest.cc`, `src/tpcustomtest.cc`, `src/Makefile` | Demo, tests and build | Course |
-| `I304 - Enunciado TP5 Thread-Pool.pdf` | Assignment statement (Spanish) | Course |
 | `docs/figures/bench.cc`, `docs/figures/bench.csv` | Benchmark and its raw output | This README |
 | `docs/figures/make_figures.py` | Figure script | This README |
 
