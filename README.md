@@ -140,6 +140,6 @@ Assignment, semaphore class and tests by the I304 teaching staff at UdeSA.
   title        = {A Dispatcher-Based Thread Pool in {C++}},
   year         = {2025},
   howpublished = {Universidad de San Andr{\'e}s, I304 Computer Architecture and Operating Systems},
-  url          = {https://github.com/Santi2065/TP5-ThreadPool-ACSO}
+  url          = {https://github.com/Santi2065/cpp-thread-pool}
 }
 ```
